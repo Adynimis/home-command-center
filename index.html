@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-popup">
+        <iframe src="/app-pages/plant-monitor/index.html" frameborder="0"></iframe>
+    </div>
+    <div id="header-container">
+        <div id="header-clock">
+            <span id="hours">12</span> :
+            <span id="minutes">00</span> :
+            <span id="seconds">00</span>
+        </div>
+        <div id="header-date">
+            <span id="month">01</span> /
+            <span id="day">01</span> /
+            <span id="year">2024</span>
+        </div>
+    </div>
+    <main>
+       <section id="row-1">
+            <div class="app" id="">
+                <span>Server Info</span>
+            </div>
+            <div class="app" id="">
+                <span>Pihole</span>
+            </div>
+            <div class="app" id="">
+                <span>Pihole</span>
+            </div>
+        </section>
+        <section id="row-2">
+            <div class="app" id="">
+                <span>Plants</span>
+            </div>
+            <div class="app" id="">
+                <span>Security</span>
+            </div>
+            <div class="app" id="">
+                <span>Pihole</span>
+            </div>
+       </section>
+       <section class="app" id="">
+            <div id="plants">
+                <span>Plants</span>
+            </div>
+            <div class="app" id="">
+                <span>Security</span>
+            </div>
+            <div class="app" id="">
+                <span>Pihole</span>
+            </div>
+       </section>
+    </main>
+    <section id="misc-info">
+        <div id="info-panel-1">
+            <span>Drive Usage</span>
+            <p id="disk-usage"></p>
+            <script>	
+                async function updateDiskUsage() {
+                const res = await fetch("/api/disk-usage");
+                const data = await res.json();
+                document.getElementById("disk-usage").innerText =
+                    `Used: ${(data.used / 1e9).toFixed(2)} GB / ${(data.total / 1e9).toFixed(2)} GB (${data.percentUsed}%)`;
+                }
+                updateDiskUsage();
+                setInterval(updateDiskUsage, 10000);
+            </script>
+        </div>
+        <div id="info-panel-2">
+            <div class="system-widget">
+               <p id="cpu-usage">CPU: 1%</p>
+               <p id="mem-usage">RAM: 19%</p>
+            </div>
+            <script>
+                async function updateSystemUsage() {
+                    try {
+                        const res = await fetch("/api/system-usage");
+                        const data = await res.json();
+
+                        document.getElementById("cpu-usage").innerText = `CPU: ${data.cpu}%`;
+                        document.getElementById("mem-usage").innerText = `RAM: ${data.memory}%`;
+                    } catch (err) {
+                        console.error("System usage fetch failed:", err);
+                    }
+                }
+                updateSystemUsage();
+                setInterval(updateSystemUsage, 2000); // update every 2 seconds
+            </script>
+        </div>
+        <div id="info-panel-3">
+            <span>Plant Monitor</span>
+            <p id="moisture">Moisture Value: No data</p>
+            <p id="time">Last Updated: Never</p>
+            <script>
+                async function loadData() {
+                    const res = await fetch('/api/plant');
+                    const data = await res.json();
+
+                    document.getElementById('moisture').innerText =
+                        'Moisture Value: ' + (data.moisture ?? 'No data');
+
+                    document.getElementById('time').innerText =
+                        'Last Updated: ' + (data.lastUpdated ?? 'Never');
+                }
+
+                // load immediately
+                loadData();
+
+                // refresh every 30 minutes
+                setInterval(loadData, 30 * 60 * 1000);
+    </script>
+        </div>
+        <div id="info-panel-4">
+            <span>Panel 4</span>
+        </div>
+        <div id="info-panel-5">
+            <span>Panel 5</span>
+        </div>
+
+    </section>
+
+    <script src="functions.js"></script>
+</body>
+</html>
